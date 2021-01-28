@@ -6,11 +6,11 @@ Uprawnienia
 - ACCESS_NETWORK_STATE
 - ACCESS_COARSE_LOCATION
 
-Testowane
+## Testowane
 - Xiaomi Redme5 api ver. 25
-
-W zależności od urządzenia możemy odczytać parametry sieci które są zaimplementowane przez producent.
-Nie testowane przez dostęp bezpośrednio do modemu za pomocą komend komendy AT.
+***uwagi***
+- W zależności od urządzenia możemy odczytać parametry sieci które są zaimplementowane przez producent.
+- Nie testowane przez dostęp bezpośrednio do modemu za pomocą komend komendy AT.
 
 Do zrobienia
 - walidacja i odczyt parametrów sieci (GSM, WCDMA, LTE, 5G)
