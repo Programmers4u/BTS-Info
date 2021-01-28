@@ -1,45 +1,33 @@
 package p4u.btsinfo;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoLte;
+import android.telephony.CellSignalStrengthGsm;
+import android.telephony.CellSignalStrengthLte;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
+import android.telephony.TelephonyManager;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import android.os.Parcel;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
-import android.telephony.CellSignalStrength;
-import android.telephony.CellSignalStrengthGsm;
-import android.telephony.CellSignalStrengthLte;
-import android.telephony.SignalStrength;
-import android.text.method.ScrollingMovementMethod;
-import android.util.JsonReader;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-
-import android.telephony.CellInfo;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.content.Context;
-import android.widget.TextView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONStringer;
-import org.xml.sax.XMLReader;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -112,6 +100,16 @@ public class MainActivity extends AppCompatActivity {
         TextView text7 = findViewById(R.id.text7);
         text7.setMovementMethod(new ScrollingMovementMethod());
 
+        String non = tm.getNetworkOperatorName();
+        TextView text1 = findViewById(R.id.text1);
+        text1.setText("Operator name: " + non );
+
+        //Network Type
+        int nt = tm.getNetworkType();
+        String mcc = tm.getNetworkOperator();
+        TextView text2 = findViewById(R.id.text2);
+        text2.setText("MCC: " + mcc.substring(0, mcc.length()-2) );
+
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -126,26 +124,52 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            String non = tm.getNetworkOperatorName();
-
-            TextView text1 = findViewById(R.id.text1);
-            text1.setText("Operator name: " + non );
-
-            //Network Type
-            int nt = tm.getNetworkType();
-            String no = tm.getNetworkOperator();
-
-            TextView text2 = findViewById(R.id.text2);
-            text2.setText("Network Type: " + no );
-
             List<CellInfo> cellInfoList = tm.getAllCellInfo();
             if (cellInfoList != null) {
                 String inf = "";//text7.getText().toString();
                 for (final CellInfo cellInfo : cellInfoList)
                 {
-                    if (cellInfo instanceof CellInfoLte) {
+                    if(cellInfo instanceof CellInfoGsm) {
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                            CellSignalStrengthGsm ssg = ((CellInfoGsm) cellInfo).getCellSignalStrength();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                try {
+                                    int ssgsm = ssg.getDbm();
+                                    inf = "" + ssg + "";
+                                } catch (NullPointerException e) {
+
+                                }
+                            } else {
+                                inf = inf + cellInfo.toString().replaceAll("\\s|\\}|\\{", "\r\n");
+                            }
+                        }
+
+                    }
+
+//                    if(cellInfo instanceof CellInfoNr) {
+//
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                            CellSignalStrengthNr ssnr = ((CellInfoNr) cellInfo).getCellSignalStrength();
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                                try {
+//                                    int ssgsm = ssnr.getDbm();
+//                                    inf = "" + ssnr + "";
+//                                } catch (NullPointerException e) {
+//
+//                                }
+//                            } else {
+//                                inf = inf + cellInfo.toString().replaceAll("\\s|\\}|\\{", "\r\n");
+//                            }
+//                        }
+//                    }
+
+                    if (cellInfo instanceof CellInfoLte) {
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+
                                 CellSignalStrengthLte ss = ((CellInfoLte) cellInfo).getCellSignalStrength();
+
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                     try {
                                         int rssi = ss.getRssi();
@@ -154,11 +178,12 @@ public class MainActivity extends AppCompatActivity {
 
                                     }
                                 } else {
-                                    inf = inf + cellInfo.toString().replaceAll(" |\\}|\\{", "\r\n");
+                                    inf = inf + cellInfo.toString().replaceAll("\\s|\\}|\\{", "\r\n");
                                 }
                         }
                     }
                 }
+
                 text7.setText("" + inf);
 
             }
@@ -207,10 +232,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 
-
             final int cdmaDbm = signalStrength.getCdmaDbm();
             final int cdmaEcio = signalStrength.getCdmaEcio();
             final int evdoSnr = signalStrength.getEvdoSnr();
+            int rssi = ((SignalStrength) signalStrength).getEvdoSnr();
+
+            // cast to CellInfoLte and call all the CellInfoLte methods you need
+            // gets RSRP cell signal strength:
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                final int getRssnr = ((CellInfoLte) signalStrength).getCellSignalStrength().getRssnr();
+            }
 
             String ltestr = signalStrength.toString();
             String[] parts = ltestr.split(" ");
@@ -222,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
             text4.setText("RSRQ: " + parts[10] + " dB");
 
             TextView text5 = findViewById(R.id.text5);
-            text5.setText("RSNR: "+ parts[11]);
+            text5.setText("RSSNR: "+ parts[11]);
 
             TextView text6 = findViewById(R.id.text6);
             text6.setText("LteSignalStrength: " + parts[8]);
@@ -231,8 +262,11 @@ public class MainActivity extends AppCompatActivity {
             text8.setText("LteCqi: " + parts[12]);
 
             TextView text9 = findViewById(R.id.text9);
-            text9.setText(" " + parts[13]);
+            text9.setText(" " + parts[15]);
 
+            TextView text10 = findViewById(R.id.text10);
+            text10.setText("evdoSnr: " + evdoSnr);
+//            mTdScdmaRscp
             /*
             The parts[] array will then contain these elements:
             part[0] = "Signalstrength:"  _ignore this, it's just the title_
@@ -247,12 +281,33 @@ public class MainActivity extends AppCompatActivity {
             parts[9] = LteRsrp
             parts[10] = LteRsrq
             parts[11] = LteRssnr
-            parts[12] = LteCqi
-            parts[13] = gsm|lte
-            parts[14] = _not reall sure what this number is_
+            parts[12] = ?
+            parts[13] = ?
+            parts[14] = LteCqi
+            parts[15] = gsm|lte
              */
 
             super.onSignalStrengthsChanged(signalStrength);
+        }
+
+        @Override
+        public void onDataConnectionStateChanged(int state) {
+
+            switch (state) {
+                case TelephonyManager.DATA_DISCONNECTED:
+                    Toast.makeText(getApplicationContext(), "DISCONNECTED", Toast.LENGTH_LONG).show();
+                    break;
+                case TelephonyManager.DATA_CONNECTED:
+                    Toast.makeText(getApplicationContext(), "CONNECTED", Toast.LENGTH_LONG).show();
+                    break;
+                case TelephonyManager.DATA_CONNECTING:
+                    Toast.makeText(getApplicationContext(), "CONNECTING", Toast.LENGTH_LONG).show();
+                    break;
+                case TelephonyManager.DATA_SUSPENDED:
+                    Toast.makeText(getApplicationContext(), "SUSPENDED", Toast.LENGTH_LONG).show();
+                    break;
+            }
+            super.onDataConnectionStateChanged(state);
         }
 
         @Override

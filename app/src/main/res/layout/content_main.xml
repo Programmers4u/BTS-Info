@@ -93,7 +93,7 @@
         app:layout_constraintHorizontal_bias="0.087"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text10"
+        app:layout_constraintTop_toBottomOf="@id/text11"
         app:layout_constraintVertical_bias="0.47" />
 
     <TextView
@@ -124,8 +124,18 @@
         android:layout_marginTop="16dp"
         android:paddingLeft="@dimen/fab_margin"
         android:text="neighborhood cells"
-        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/text9"
+        tools:layout_editor_absoluteX="33dp" />
+
+    <TextView
+        android:id="@+id/text11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="@dimen/fab_margin"
+        android:text="neighborhood cells: "
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/text10"
         tools:layout_editor_absoluteX="33dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
