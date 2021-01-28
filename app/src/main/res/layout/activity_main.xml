@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="32dip"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@android:drawable/ic_menu_rotate" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
