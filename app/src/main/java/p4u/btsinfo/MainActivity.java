@@ -16,6 +16,7 @@ import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellSignalStrength;
 import android.telephony.CellSignalStrengthGsm;
+import android.telephony.CellSignalStrengthLte;
 import android.telephony.SignalStrength;
 import android.util.JsonReader;
 import android.view.View;
@@ -133,24 +134,68 @@ public class MainActivity extends AppCompatActivity {
             List<CellInfo> cellInfoList = tm.getAllCellInfo();
             if (cellInfoList != null) {
                 String inf = "";
-                for (final CellInfo cellInfo : cellInfoList) {
+                for (final CellInfo cellInfo : cellInfoList)
+                {
                     if (cellInfo instanceof CellInfoLte) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                            int a = ((CellInfoLte) cellInfo).getCellSignalStrength().getRssi();
-                            inf = "" + a +"";
-                        }
-                    }                }
-                text7.setText("Cell info : " + inf);
+                            try {
+                                CellSignalStrengthLte a = ((CellInfoLte) cellInfo).getCellSignalStrength();
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    int v = a.getRssi();
+                                }
+//                                String a = cellInfo.toString();
+//                                inf = "" + v +"";
+                            } catch (NullPointerException e) {
 
+                            }
+                        } else {
+                            inf = cellInfo.toString();
+                        }
+                    }
+                }
+                text7.setText("Cell info : " + inf);
 
             }
         } catch (NullPointerException npe) {
         }
+
+//        try {
+//            cellInfoList = tm.getAllCellInfo();
+//            for (CellInfo cellInfo : cellInfoList) {
+//                if (cellInfo instanceof CellInfoLte) {
+//                    // cast to CellInfoLte and call all the CellInfoLte methods you need
+//                    // gets RSRP cell signal strength:
+//                    cellSig = ((CellInfoLte) cellInfo).getCellSignalStrength().getDbm();
+//
+//                    // Gets the LTE cell identity: (returns 28-bit Cell Identity, Integer.MAX_VALUE if unknown)
+//                    cellID = ((CellInfoLte) cellInfo).getCellIdentity().getCi();
+//
+//                    // Gets the LTE cell identity: (returns 28-bit Cell Identity, Integer.MAX_VALUE if unknown)
+//                    cellRssi = ((CellInfoLte) cellInfo).getCellSignalStrength().getRssi();
+                    // Gets the LTE MCC: (returns 3-digit Mobile Country Code, 0..999, Integer.MAX_VALUE if unknown)
+//                        cellMcc = ((CellInfoLte) cellInfo).getCellIdentity().getMcc();
+//
+//                        // Gets theLTE MNC: (returns 2 or 3-digit Mobile Network Code, 0..999, Integer.MAX_VALUE if unknown)
+//                        cellMnc = ((CellInfoLte) cellInfo).getCellIdentity().getMnc();
+//
+//                        // Gets the LTE PCI: (returns Physical Cell Id 0..503, Integer.MAX_VALUE if unknown)
+//                        cellPci = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
+//
+//                        // Gets the LTE TAC: (returns 16-bit Tracking Area Code, Integer.MAX_VALUE if unknown)
+//                        cellTac = ((CellInfoLte) cellInfo).getCellIdentity().getTac();
+
+//                }
+//            }
+//        } catch (Exception e) {
+//            Log.d("SignalStrength", "+++++++++++++++++++++++++++++++ null array spot 3: " + e);
+//        }
+
     }
 
     private class SignalStrengthListener extends PhoneStateListener {
 
         public int signalStrengthValue;
+        private int cellSig, cellID, cellRssi;
 
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
@@ -217,41 +262,8 @@ public class MainActivity extends AppCompatActivity {
             parts[14] = _not reall sure what this number is_
              */
 
-//
-//        try {
-//            cellInfoList = tm.getAllCellInfo();
-//            for (CellInfo cellInfo : cellInfoList) {
-//                if (cellInfo instanceof CellInfoLte) {
-//                    // cast to CellInfoLte and call all the CellInfoLte methods you need
-//                    // gets RSRP cell signal strength:
-//                    cellSig = ((CellInfoLte) cellInfo).getCellSignalStrength().getDbm();
-//
-//                    // Gets the LTE cell identity: (returns 28-bit Cell Identity, Integer.MAX_VALUE if unknown)
-//                    cellID = ((CellInfoLte) cellInfo).getCellIdentity().getCi();
-//
-//                    // Gets the LTE MCC: (returns 3-digit Mobile Country Code, 0..999, Integer.MAX_VALUE if unknown)
-//                    cellMcc = ((CellInfoLte) cellInfo).getCellIdentity().getMcc();
-//
-//                    // Gets theLTE MNC: (returns 2 or 3-digit Mobile Network Code, 0..999, Integer.MAX_VALUE if unknown)
-//                    cellMnc = ((CellInfoLte) cellInfo).getCellIdentity().getMnc();
-//
-//                    // Gets the LTE PCI: (returns Physical Cell Id 0..503, Integer.MAX_VALUE if unknown)
-//                    cellPci = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
-//
-//                    // Gets the LTE TAC: (returns 16-bit Tracking Area Code, Integer.MAX_VALUE if unknown)
-//                    cellTac = ((CellInfoLte) cellInfo).getCellIdentity().getTac();
-//
-//                }
-//            }
-//        } catch (Exception e) {
-//            Log.d("SignalStrength", "+++++++++++++++++++++++++++++++ null array spot 3: " + e);
-//        }
-
-
-        super.onSignalStrengthsChanged(signalStrength);
-
+            super.onSignalStrengthsChanged(signalStrength);
         }
-
 
         @Override
         public void onCellInfoChanged(List<CellInfo> cellInfo) {
