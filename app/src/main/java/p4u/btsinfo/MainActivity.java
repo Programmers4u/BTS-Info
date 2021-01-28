@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.CellIdentity;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
@@ -100,9 +101,10 @@ public class MainActivity extends AppCompatActivity {
         TextView text7 = findViewById(R.id.text7);
         text7.setMovementMethod(new ScrollingMovementMethod());
 
+
         String non = tm.getNetworkOperatorName();
         TextView text1 = findViewById(R.id.text1);
-        text1.setText("Operator name: " + non );
+        text1.setText("Netrwork name: " + non );
 
         //Network Type
         int nt = tm.getNetworkType();
@@ -165,13 +167,16 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 
                     if (cellInfo instanceof CellInfoLte) {
+                        int cellMcc = ((CellInfoLte) cellInfo).getCellIdentity().getMcc();
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
 
-                                CellSignalStrengthLte ss = ((CellInfoLte) cellInfo).getCellSignalStrength();
+                            CellSignalStrengthLte ss = ((CellInfoLte) cellInfo).getCellSignalStrength();
 
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                     try {
+                                        int Bandwidth = ((CellInfoLte) cellInfo).getCellIdentity().getBandwidth();
+                                        int Dbm = ((CellInfoLte) cellInfo).getCellSignalStrength().getDbm();
                                         int rssi = ss.getRssi();
                                         inf = "" + rssi + "";
                                     } catch (NullPointerException e) {
@@ -192,42 +197,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-//        try {
-//            cellInfoList = tm.getAllCellInfo();
-//            for (CellInfo cellInfo : cellInfoList) {
-//                if (cellInfo instanceof CellInfoLte) {
-//                    // cast to CellInfoLte and call all the CellInfoLte methods you need
-//                    // gets RSRP cell signal strength:
-//                    cellSig = ((CellInfoLte) cellInfo).getCellSignalStrength().getDbm();
-//
-//                    // Gets the LTE cell identity: (returns 28-bit Cell Identity, Integer.MAX_VALUE if unknown)
-//                    cellID = ((CellInfoLte) cellInfo).getCellIdentity().getCi();
-//
-//                    // Gets the LTE cell identity: (returns 28-bit Cell Identity, Integer.MAX_VALUE if unknown)
-//                    cellRssi = ((CellInfoLte) cellInfo).getCellSignalStrength().getRssi();
-                    // Gets the LTE MCC: (returns 3-digit Mobile Country Code, 0..999, Integer.MAX_VALUE if unknown)
-//                        cellMcc = ((CellInfoLte) cellInfo).getCellIdentity().getMcc();
-//
-//                        // Gets theLTE MNC: (returns 2 or 3-digit Mobile Network Code, 0..999, Integer.MAX_VALUE if unknown)
-//                        cellMnc = ((CellInfoLte) cellInfo).getCellIdentity().getMnc();
-//
-//                        // Gets the LTE PCI: (returns Physical Cell Id 0..503, Integer.MAX_VALUE if unknown)
-//                        cellPci = ((CellInfoLte) cellInfo).getCellIdentity().getPci();
-//
-//                        // Gets the LTE TAC: (returns 16-bit Tracking Area Code, Integer.MAX_VALUE if unknown)
-//                        cellTac = ((CellInfoLte) cellInfo).getCellIdentity().getTac();
-
-//                }
-//            }
-//        } catch (Exception e) {
-//            Log.d("SignalStrength", "+++++++++++++++++++++++++++++++ null array spot 3: " + e);
-//        }
-
     }
 
     private class SignalStrengthListener extends PhoneStateListener {
-
-        public int signalStrengthValue;
 
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
@@ -235,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
             final int cdmaDbm = signalStrength.getCdmaDbm();
             final int cdmaEcio = signalStrength.getCdmaEcio();
             final int evdoSnr = signalStrength.getEvdoSnr();
-            int rssi = ((SignalStrength) signalStrength).getEvdoSnr();
 
             // cast to CellInfoLte and call all the CellInfoLte methods you need
             // gets RSRP cell signal strength:
@@ -253,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
             text4.setText("RSRQ: " + parts[10] + " dB");
 
             TextView text5 = findViewById(R.id.text5);
-            text5.setText("RSSNR: "+ parts[11]);
+            text5.setText("RSSNR: "+ parts[11] + "");
+//            - ref. sig. signal-to-noise ratio
 
             TextView text6 = findViewById(R.id.text6);
             text6.setText("LteSignalStrength: " + parts[8]);
@@ -265,11 +237,10 @@ public class MainActivity extends AppCompatActivity {
             text9.setText(" " + parts[15]);
 
             TextView text10 = findViewById(R.id.text10);
-            text10.setText("evdoSnr: " + evdoSnr);
+            text10.setText("Rssi: " + evdoSnr);
 //            mTdScdmaRscp
             /*
             The parts[] array will then contain these elements:
-            part[0] = "Signalstrength:"  _ignore this, it's just the title_
             parts[1] = GsmSignalStrength
             parts[2] = GsmBitErrorRate
             parts[3] = CdmaDbm
