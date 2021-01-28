@@ -1,18 +1,18 @@
 # BTS-Info
 
-Uprawnienia
-
+## Uprawnienia
 - READ_PHONE_STATE
 - ACCESS_NETWORK_STATE
 - ACCESS_COARSE_LOCATION
 
 ## Testowane
 - Xiaomi Redme5 api ver. 25
+
 ***uwagi***
 - W zależności od urządzenia możemy odczytać parametry sieci które są zaimplementowane przez producent.
 - Nie testowane przez dostęp bezpośrednio do modemu za pomocą komend komendy AT.
 
-Do zrobienia
+## Do zrobienia
 - walidacja i odczyt parametrów sieci (GSM, WCDMA, LTE, 5G)
 - komendy AT
 - komunikacja z api
@@ -28,4 +28,3 @@ Aplikacja wymaga rozbudowy i większego nakładu czasu pracy niż zakładałem n
 Daje to też drogę do prostej aplikacji z modelem detekcji SI do wykrywania anamoali w sieci, np. wykrywacz podsłuchów których używają służby do podszywania się pod sieć [https://en.wikipedia.org/wiki/IMSI-catcher] ;)
 
 W razie problemów z uruchomieniem lub widać tylko (text1,text2,....), należy sprawdzić uprawnienia, w testowanym Redme5 konieczne było ręczne zaakceptowanie Lokalizacji (Location)
-
