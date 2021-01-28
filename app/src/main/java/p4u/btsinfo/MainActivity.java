@@ -2,6 +2,7 @@ package p4u.btsinfo;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -18,6 +19,7 @@ import android.telephony.CellSignalStrength;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.SignalStrength;
+import android.text.method.ScrollingMovementMethod;
 import android.util.JsonReader;
 import android.view.View;
 import android.view.Menu;
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     SignalStrengthListener signalStrengthListener;
 
     List<CellInfo> cellInfoList;
+
     TelephonyManager tm;
 
     @Override
@@ -57,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                loadCellInfo();
+                Snackbar.make(view, "@p4u bts-info:refresh", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -103,9 +107,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadCellInfo(TelephonyManager tm) {
+    public void loadCellInfo() {
 
         TextView text7 = findViewById(R.id.text7);
+        text7.setMovementMethod(new ScrollingMovementMethod());
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -123,40 +128,43 @@ public class MainActivity extends AppCompatActivity {
 
             String non = tm.getNetworkOperatorName();
 
-            TextView text5 = findViewById(R.id.text5);
-            text5.setText("Operator name: " + non );
+            TextView text1 = findViewById(R.id.text1);
+            text1.setText("Operator name: " + non );
 
             //Network Type
             int nt = tm.getNetworkType();
             String no = tm.getNetworkOperator();
 
+            TextView text2 = findViewById(R.id.text2);
+            text2.setText("Network Type: " + no );
 
             List<CellInfo> cellInfoList = tm.getAllCellInfo();
             if (cellInfoList != null) {
-                String inf = "";
+                String inf = "";//text7.getText().toString();
                 for (final CellInfo cellInfo : cellInfoList)
                 {
                     if (cellInfo instanceof CellInfoLte) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                            try {
-                                CellSignalStrengthLte a = ((CellInfoLte) cellInfo).getCellSignalStrength();
+                                CellSignalStrengthLte ss = ((CellInfoLte) cellInfo).getCellSignalStrength();
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    int v = a.getRssi();
-                                }
-//                                String a = cellInfo.toString();
-//                                inf = "" + v +"";
-                            } catch (NullPointerException e) {
+                                    try {
+                                        int rssi = ss.getRssi();
+                                        inf = "" + rssi + "";
+                                    } catch (NullPointerException e) {
 
-                            }
-                        } else {
-                            inf = cellInfo.toString();
+                                    }
+                                } else {
+                                    inf = inf + cellInfo.toString().replaceAll(" |\\}|\\{", "\r\n");
+                                }
                         }
                     }
                 }
-                text7.setText("Cell info : " + inf);
+                text7.setText("" + inf);
 
             }
         } catch (NullPointerException npe) {
+            Log.d("loadCellInfo", "+++++++++++++++++++++++++++++++++++++++++ null array spot 1: " + npe);
+
         }
 
 //        try {
@@ -195,53 +203,35 @@ public class MainActivity extends AppCompatActivity {
     private class SignalStrengthListener extends PhoneStateListener {
 
         public int signalStrengthValue;
-        private int cellSig, cellID, cellRssi;
 
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 
-            tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            loadCellInfo(tm);
 
             final int cdmaDbm = signalStrength.getCdmaDbm();
             final int cdmaEcio = signalStrength.getCdmaEcio();
             final int evdoSnr = signalStrength.getEvdoSnr();
 
-            try {
-//                List<CellSignalStrength> mSignalStrength = signalStrength.getCellSignalStrengths();
-//            mSignalStrength = (2 * mSignalStrength) - 113; // -> dBm
-
-                if (signalStrength.isGsm()) {
-                    if (signalStrength.getGsmSignalStrength() != 99)
-                        signalStrengthValue = signalStrength.getGsmSignalStrength() * 2 - 113;
-                    else
-                        signalStrengthValue = signalStrength.getGsmSignalStrength();
-                } else {
-                    signalStrengthValue = signalStrength.getCdmaDbm();
-                }
-                TextView text6 = findViewById(R.id.text6);
-                text6.setText("Signal Strength : " + signalStrengthValue);
-
-            } catch(Exception e) {
-
-            }
-
-
             String ltestr = signalStrength.toString();
             String[] parts = ltestr.split(" ");
-//            String cellSig2 = parts[9];
-
-            TextView text1 = findViewById(R.id.text1);
-            text1.setText("RSRP: " + parts[9] +" dBm");
-
-            TextView text2 = findViewById(R.id.text2);
-            text2.setText("RSNR: "+ parts[11]);
 
             TextView text3 = findViewById(R.id.text3);
-            text3.setText("RSRQ: " + parts[10] + " dB");
+            text3.setText("RSRP: " + parts[9] +" dBm");
 
             TextView text4 = findViewById(R.id.text4);
-            text4.setText("LteSignalStrength: " + parts[8]);
+            text4.setText("RSRQ: " + parts[10] + " dB");
+
+            TextView text5 = findViewById(R.id.text5);
+            text5.setText("RSNR: "+ parts[11]);
+
+            TextView text6 = findViewById(R.id.text6);
+            text6.setText("LteSignalStrength: " + parts[8]);
+
+            TextView text8 = findViewById(R.id.text8);
+            text8.setText("LteCqi: " + parts[12]);
+
+            TextView text9 = findViewById(R.id.text9);
+            text9.setText(" " + parts[13]);
 
             /*
             The parts[] array will then contain these elements:
@@ -278,8 +268,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             } else {
-                tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-                loadCellInfo(tm);
+                loadCellInfo();
             }
 
             super.onCellInfoChanged(cellInfo);
