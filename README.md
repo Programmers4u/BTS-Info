@@ -1,30 +1,30 @@
 # BTS-Info
 
-## Uprawnienia
+## Permissions
 - READ_PHONE_STATE
 - ACCESS_NETWORK_STATE
 - ACCESS_COARSE_LOCATION
 
-## Testowane
+## Testing
 - Xiaomi Redme5 api ver. 25
 
-***uwagi***
-- W zależności od urządzenia możemy odczytać parametry sieci które są zaimplementowane przez producent.
-- Nie testowane przez dostęp bezpośrednio do modemu za pomocą komend komendy AT.
+***comments***
+- Depending on the device, we can read the network parameters that are implemented by the manufacturer.
+- Not tested by accessing the modem directly using AT commands.
 
-## Do zrobienia
-- walidacja i odczyt parametrów sieci (GSM, WCDMA, LTE, 5G)
-- komendy AT
-- komunikacja z api
-- uprawnienia do ACCESS_COARSE_LOCATION
-- przetestowanie na większej ilości urządzeń
+## To do
+- validation and reading of network parameters (GSM, WCDMA, LTE, 5G)
+- AT commands
+- communication with api
+- permissions for ACCESS_COARSE_LOCATION
+- testing on more devices
 
-Temat w sumie okazał się nawet ciekawy.
-Tak jak podaje https://www2.azenqos.com/devices (generalnie należałoby samemu przetestować różnych producentów i różne modele urządzeń), program będzie działał dobrze z konkretnymi urządzeniami których producenci zaimplementowali odpowiednie metody do odczytu parametrów.
-Wyniki testu są zadawalające, bo przy wyborze odpowiedniego urządzenia można odczytać wszytskie parametry które aktualnie udostępnia sieć.
+The topic actually turned out to be interesting.
+As stated by https://www2.azenqos.com/devices (generally, you should test different manufacturers and different device models yourself), the program will work well with specific devices whose manufacturers have implemented appropriate methods for reading parameters.
+The test results are satisfactory because when selecting the appropriate device, you can read all the parameters currently provided by the network.
 
-Aplikacja wymaga rozbudowy i większego nakładu czasu pracy niż zakładałem na początku ale wygląda obiecująco, warto ją rozwijać nawet gdyby klient nie zamierzał tego kupić. Azenqos sprzedaje po 1800 usd za licencję, to wygląda na całkiem dochodowy biznes, 100 sosób i 180 000 usd :)
+The application requires expansion and more work than I expected at the beginning, but it looks promising, it is worth developing even if the customer did not intend to buy it. Azenqos sells for USD 1,800 per license, it looks like quite a profitable business, 100 people and USD 180,000 :)
 
-Daje to też drogę do prostej aplikacji z modelem detekcji SI do wykrywania anamoali w sieci, np. wykrywacz podsłuchów których używają służby do podszywania się pod sieć [https://en.wikipedia.org/wiki/IMSI-catcher] ;)
+This also provides a path to a simple application with an AI detection model for detecting anamoalas in the network, e.g. a detector of wiretapping used by services to impersonate the network [https://en.wikipedia.org/wiki/IMSI-catcher] ;)
 
-W razie problemów z uruchomieniem lub widać tylko (text1,text2,....), należy sprawdzić uprawnienia, w testowanym Redme5 konieczne było ręczne zaakceptowanie Lokalizacji (Location)
+In case of problems with launching or only (text1,text2,....) is visible, you should check the permissions, in the tested Redme5 it was necessary to manually accept the Location
